@@ -13,7 +13,22 @@ import Modal from "react-bootstrap/Modal";
 export function Usuarios() {
     const [usuarios, setUsuarios] = useState([]);
     const [mostrarModal, setMostrarModal] = useState(false);
-    const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);
+    const [usuarioSelecionado, setUsuarioSelecionado] = useState(null);    
+    const [tiposUsuarios, setTiposUsuarios] = useState([]);
+
+    useEffect(() => {
+        const fetchTiposUsuarios = async () => {
+            try {
+                const tipos = await UsuarioAPI.listarTiposUsuarioAsync();
+                setTiposUsuarios(tipos);
+            } catch (error) {
+                console.error('Erro ao buscar tipos de usuários:', error);
+            }
+        };
+
+        fetchTiposUsuarios();
+    }, []);
+
 
     const handleCLickDeletar = (usuario) => {
         setUsuarioSelecionado(usuario)
@@ -40,6 +55,7 @@ export function Usuarios() {
         try {
             const listaUsuarios = await UsuarioAPI.listarAsync(true);
             setUsuarios(listaUsuarios);
+            console.log(usuarios);
         } catch (error) {
             console.error("Erro ao carregar usuários:", error);
         }    
@@ -72,8 +88,8 @@ export function Usuarios() {
                                 {usuarios.map((usuario) => (
                                     <tr key={usuario.id}>
                                         <td>{usuario.nome}</td>
-                                        <td>{usuario.email}</td>
-                                        <td>{usuario.tipoUsuarioId}</td>
+                                        <td>{usuario.email}</td>                                        
+                                        <td>{tiposUsuarios.find((tipo) => tipo.id == usuario.tipoUsuarioId).nome}</td>
                                         <td>
                                             <Link to='/usuario/editar' state={usuario.id} className={style.botao_editar}>
                                                 <MdEdit />
