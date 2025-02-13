@@ -1,7 +1,7 @@
 import style from "./Sidebar.module.css";
 import Logo from "../../assets/LogoBranco.png";
 import { SidebarItem } from "../SidebarItem/SidebarItem";
-import { MdGroup } from "react-icons/md";
+import { MdDesktopWindows, MdGroup } from "react-icons/md";
 
 export function Sidebar({ children })
 {
@@ -16,6 +16,9 @@ export function Sidebar({ children })
 
                 <div className={style.sidebar_corpo}>
                     <SidebarItem texto="Usuarios" link="/usuarios" logo={<MdGroup />} />
+                </div>
+                <div className={style.sidebar_corpo}>
+                   <SidebarItem texto="Projetos" link="/projetos" logo={<MdDesktopWindows />}/>
                 </div>
             </div>
             <div className={style.pagina_conteudo}>
