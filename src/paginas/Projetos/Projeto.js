@@ -26,17 +26,17 @@ export function Projetos() {
   const [novoProjeto, setNovoProjeto] = useState({ nome: "", descricao: "" });
   const [projetoArrastado, setProjetoArrastado] = useState(null); // Estado para armazenar o projeto sendo arrastado
 
-const handleDragStart = (e, index) => {
+  const handleDragStart = (e, index) => {
     setProjetoArrastado(index); // Armazena o índice do projeto sendo arrastado
     e.dataTransfer.effectAllowed = "move"; // Define o efeito de arrastar como "move"
-};
+  };
 
-const handleDragOver = (e) => {
+  const handleDragOver = (e) => {
     e.preventDefault(); // Permite que o elemento seja solto
     e.dataTransfer.dropEffect = "move"; // Define o efeito de soltar como "move"
-};
+  };
 
-const handleDrop = (e, index) => {
+  const handleDrop = (e, index) => {
     e.preventDefault();
     if (projetoArrastado === null) return;
 
@@ -48,7 +48,7 @@ const handleDrop = (e, index) => {
     setProjetos(novaLista);
     setProjetosFiltrados(novaLista); // Atualiza a lista filtrada
     setProjetoArrastado(null); // Limpa o estado do projeto arrastado
-};
+  };
 
   const handleClickDeletar = (projeto) => {
     setProjetoSelecionado(projeto);
@@ -132,7 +132,7 @@ const handleDrop = (e, index) => {
               + Novo
             </button>
           </div>
-          <div className={style.input}>
+          <div className={style.inputPrincipal}>
             <input
               placeholder="Filtrar..."
               type="text"
@@ -143,6 +143,12 @@ const handleDrop = (e, index) => {
             <button className={style.button} onClick={handleClearFiltro}>
               X
             </button>
+            <form className={style.formEstilizado}>
+              <input className={style.inputEstilizado} autocomplete="off" required />
+              <label className={style.labelEstilizado} for="Filtrar...">
+                <span className={style.spanEstilizado}>Filtrar...</span>
+              </label>
+            </form>
           </div>
 
           <div className={style.tabela}>
