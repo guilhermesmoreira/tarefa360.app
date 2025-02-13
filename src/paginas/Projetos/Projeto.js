@@ -1,22 +1,29 @@
 import { Sidebar } from '../../componentes/Sidebar/Sidebar';
 import { Topbar } from '../../componentes/Topbar/Topbar';
 import { Link } from 'react-router-dom';
-import { MdDelete, MdEdit, MdSave } from 'react-icons/md'; // Adicionei MdSave para o ícone de salvar
+import { MdDelete, MdEdit, MdSave } from 'react-icons/md';
 import { useState, useEffect } from 'react';
 import style from './Projeto.module.css';
 import Table from 'react-bootstrap/esm/Table';
-import ProjetoApi from '../../services/projetoAPI';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form'; // Importei o Form para os campos de input
+import Form from 'react-bootstrap/Form';
 
 export function Projetos() {
-    const [projetos, setProjetos] = useState([]);
+    // Lista de projetos mockados
+    const projetosMockados = [
+        { id: 1, nome: 'Projeto Alpha', descricao: 'Descrição do Projeto Alpha' },
+        { id: 2, nome: 'Projeto Beta', descricao: 'Descrição do Projeto Beta' },
+        { id: 3, nome: 'Projeto Gamma', descricao: 'Descrição do Projeto Gamma' },
+    ];
+
+    const [projetos, setProjetos] = useState(projetosMockados); // Inicializa com dados mockados
+    const [projetosFiltrados, setProjetosFiltrados] = useState(projetosMockados); // Inicializa com dados mockados
     const [mostrarModalDeletar, setMostrarModalDeletar] = useState(false);
-    const [mostrarModalNovo, setMostrarModalNovo] = useState(false); // Estado para controlar o modal de novo projeto
+    const [mostrarModalNovo, setMostrarModalNovo] = useState(false);
     const [projetoSelecionado, setProjetoSelecionado] = useState(null);
-    const [inputSelecionado, setInputSelecionado] = useState({ input: '' });
-    const [novoProjeto, setNovoProjeto] = useState({ nome: '', descricao: '' }); // Estado para os campos do novo projeto
+    const [filtro, setFiltro] = useState('');
+    const [novoProjeto, setNovoProjeto] = useState({ nome: '', descricao: '' });
 
     const handleClickDeletar = (projeto) => {
         setProjetoSelecionado(projeto);
@@ -25,8 +32,9 @@ export function Projetos() {
 
     const handleDeletar = async () => {
         try {
-            await ProjetoApi.deletarAsync(projetoSelecionado.id);
+            // Simula a exclusão do projeto
             setProjetos(projetos.filter(p => p.id !== projetoSelecionado.id));
+            setProjetosFiltrados(projetosFiltrados.filter(p => p.id !== projetoSelecionado.id));
         } catch (error) {
             console.error("Erro ao deletar projeto", error);
         } finally {
@@ -41,43 +49,48 @@ export function Projetos() {
 
     const handleFecharModalNovo = () => {
         setMostrarModalNovo(false);
-        setNovoProjeto({ nome: '', descricao: '' }); // Limpa os campos ao fechar o modal
+        setNovoProjeto({ nome: '', descricao: '' });
     };
 
-    const handleChange = (e) => {
-        setInputSelecionado({ ...inputSelecionado, [e.target.name]: e.target.value });
+    const handleChangeFiltro = (e) => {
+        const valor = e.target.value;
+        setFiltro(valor);
+        filtrarProjetos(valor);
     };
 
     const handleChangeNovoProjeto = (e) => {
         setNovoProjeto({ ...novoProjeto, [e.target.name]: e.target.value });
     };
 
-    const handleClear = () => {
-        setInputSelecionado({ input: '' });
+    const handleClearFiltro = () => {
+        setFiltro('');
+        setProjetosFiltrados(projetos); // Restaura a lista completa ao limpar o filtro
     };
 
     const handleSalvarNovoProjeto = async () => {
         try {
-            const projetoSalvo = await ProjetoApi.criarAsync(novoProjeto);
-            setProjetos([...projetos, projetoSalvo]); // Adiciona o novo projeto à lista
-            handleFecharModalNovo(); // Fecha o modal após salvar
+            // Simula a criação de um novo projeto
+            const novoId = projetos.length + 1; // Gera um ID simples
+            const projetoSalvo = { id: novoId, ...novoProjeto };
+            setProjetos([...projetos, projetoSalvo]);
+            setProjetosFiltrados([...projetosFiltrados, projetoSalvo]);
+            handleFecharModalNovo();
         } catch (error) {
             console.error("Erro ao salvar projeto", error);
         }
     };
 
-    async function carregarProjetos() {
-        try {
-            const listaProjetos = await ProjetoApi.listarAsync(true);
-            setProjetos(listaProjetos);
-        } catch (error) {
-            console.error("Erro ao carregar projetos: ", error);
-        }
-    }
+    const filtrarProjetos = (valor) => {
+        const filtrados = projetos.filter(projeto =>
+            projeto.nome.toLowerCase().includes(valor.toLowerCase())
+        );
+        setProjetosFiltrados(filtrados);
+    };
 
-    useEffect(() => {
-        carregarProjetos();
-    }, []);
+    // Remove o useEffect que carrega os projetos da API, pois estamos usando dados mockados
+    // useEffect(() => {
+    //     carregarProjetos();
+    // }, []);
 
     return (
         <Sidebar>
@@ -93,11 +106,11 @@ export function Projetos() {
                         <input
                             placeholder="Filtrar..."
                             type="text"
-                            name="input"
-                            value={inputSelecionado.input}
-                            onChange={handleChange}
+                            name="filtro"
+                            value={filtro}
+                            onChange={handleChangeFiltro}
                         />
-                        <button className={style.button} onClick={handleClear}>X</button>
+                        <button className={style.button} onClick={handleClearFiltro}>X</button>
                     </div>
 
                     <div className={style.tabela}>
@@ -110,7 +123,7 @@ export function Projetos() {
                             </thead>
 
                             <tbody className={style.tabela_corpo}>
-                                {projetos.map(projeto => (
+                                {projetosFiltrados.map(projeto => (
                                     <tr key={projeto.id}>
                                         <td>{projeto.nome}</td>
                                         <td>
